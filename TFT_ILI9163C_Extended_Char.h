@@ -4,7 +4,9 @@
 // ILI9163C_Extended_Char
 //
 // This extends TFT_ILI9163C library by changing the method setCursor(), which allows the user to specify the cursor's position as if the display were character sized cursor based (6 pixels x 9 pixels), rather than pixels. 
-//It is no longer possible to position the cursor, by pixel, as before using the setCursor() method.
+// It is no longer possible to position the cursor, by pixel, as before using the setCursor() method - no longer true:
+// It is possible to position the cursor, by pixel, as before using the setCursor() method, by calling setCursorMode(false).
+// Calling setCursorMode(true) will revert the cursor positioning to character resolution. This is the default.
 // Please see also the ILI9163C_Extended library
 
 */	
@@ -55,9 +57,16 @@ class TFT_ILI9163C_Extended_Char : public TFT_ILI9163C {
 	#endif
 	//TFT_ILI9163C_Extended_Char(uint8_t CS, uint8_t DC);//connect rst pin to VDD
         void setCursor(int16_t x,int16_t y);//char addressing
+        void clear();
+
+        void setCursorMode(boolean characterResolutionOn);
+
 // Delete - used only in Extended, not Extended_Char
 //        void setCursorChar(int16_t x,int16_t y);//char addressing
 // Delete - used only in Extended, not Extended_Char
+
+private:
+ boolean kCharacterResolution;
 
 };
 #endif

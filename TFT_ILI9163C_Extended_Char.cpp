@@ -4,7 +4,9 @@
 // ILI9163C_Extended_Char
 //
 // This extends TFT_ILI9163C library by changing the method setCursor(), which allows the user to specify the cursor's position as if the display were character sized cursor based (6 pixels x 9 pixels), rather than pixels. 
-//It is no longer possible to position the cursor, by pixel, as before using the setCursor() method.
+// It is no longer possible to position the cursor, by pixel, as before using the setCursor() method - no longer true:
+// It is possible to position the cursor, by pixel, as before using the setCursor() method, by calling setCursorMode(false).
+// Calling setCursorMode(true) will revert the cursor positioning to character resolution. This is the default.
 // Please see also the ILI9163C_Extended library
 
 */	
@@ -27,6 +29,8 @@ const int kCharacterHeight = 9;
 // TextSize = 3 gives display 7 characters wide, 4 characters high
 const int kCharacterSize = 1;
 
+boolean kCharacterResolution = true;
+
 
 //constructors
 
@@ -38,6 +42,7 @@ const int kCharacterSize = 1;
 		_rst  = rstpin;
 		_mosi = mosi;
 		_sclk = sclk;
+  kCharacterResolution = true;
 	}
 #elif defined(__MKL26Z64__)
 	TFT_ILI9163C_Extended_Char::TFT_ILI9163C_Extended_Char(uint8_t cspin,uint8_t dcpin,uint8_t rstpin,uint8_t mosi,uint8_t sclk) : TFT_ILI9163C(_TFTWIDTH,_TFTHEIGHT)
@@ -49,6 +54,7 @@ const int kCharacterSize = 1;
 		_sclk = sclk;
 		_useSPI1 = false;
 		if ((_mosi == 0 || _mosi == 21) && (_sclk == 20)) _useSPI1 = true;
+  kCharacterResolution = true;
 	}
 #else
 	TFT_ILI9163C_Extended_Char::TFT_ILI9163C_Extended_Char(uint8_t cspin,uint8_t dcpin,uint8_t rstpin) : TFT_ILI9163C(_TFTWIDTH,_TFTHEIGHT)
@@ -56,12 +62,31 @@ const int kCharacterSize = 1;
 		_cs   = cspin;
 		_rs   = dcpin;
 		_rst  = rstpin;
+  kCharacterResolution = true;
 	}
 #endif
 
   void TFT_ILI9163C_Extended_Char::setCursor(int16_t x, int16_t y) {
-      TFT_ILI9163C::setCursor(x*kCharacterWidth*kCharacterSize, y*kCharacterHeight*kCharacterSize);
+    if (kCharacterResolution){
+      x = x*kCharacterWidth*kCharacterSize;
+      y = y*kCharacterHeight*kCharacterSize;
+    }
+    TFT_ILI9163C::setCursor(x,y);
   }
+ 
+  void TFT_ILI9163C_Extended_Char::clear() {
+      clearScreen(0x0000);
+  }
+
+
+// +++++++++
+// set modes
+// +++++++++
+
+void TFT_ILI9163C_Extended_Char::setCursorMode(boolean characterResolutionOn){
+  kCharacterResolution = characterResolutionOn;
+}
+
 
 // Delete - used only in Extended, not Extended_Char
 //  void TFT_ILI9163C_Extended_Char::setCursorChar(int16_t x, int16_t y) {
